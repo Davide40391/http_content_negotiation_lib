@@ -31,3 +31,10 @@ The trade-off: `negotiate()` only **selects**. It does not transcode, compress, 
 - **Only `*/*` and `type/*` wildcards are supported.** The `type/*+suffix` construct from RFC 7231 §3.1.1.1 is not honoured; it is rare in real traffic and supporting it cleanly requires a separate parser.
 - **An empty header returns the first available option**, matching the spec's "absent header = any representation is acceptable" rule.
 - **Parameter values are not de-quoted.** If a client sends `charset="utf-8"` the stored value is the literal string `"utf-8"` including quotes. Real Accept headers almost never quote values.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
